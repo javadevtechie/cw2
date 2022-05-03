@@ -1,15 +1,16 @@
 package application;
 
 import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -27,11 +28,16 @@ public class FxCSSExample7 extends Application {
 
 	private int minutes;
 	private int seconds;
-	private Timeline timeline;
-	private Text timer;
-	private int counter;
-	private Text value;
 
+	private Text timer;
+	private Text value;
+	static double ii = 0;
+	private static final Integer STARTTIME = 15;
+	private Timeline timeline;
+	private Timeline timeline1;
+	private Text timerLabel = new Text();
+	private IntegerProperty timeSeconds = new SimpleIntegerProperty(STARTTIME * 100);
+	
 	public FxCSSExample7() {
 		minutes = 19;
 		seconds = 59;
@@ -113,8 +119,15 @@ public class FxCSSExample7 extends Application {
 		Pane pane3 = effortLevel("effort level", 40);
 
 		vbox1.getChildren().addAll(pane2, pane3);
+
+		VBox vbox2 = new VBox();
+
+		Pane pane4 = returnRect("calories", 20, "kcal", 45, "571", 80);
+		Pane pane5 = timeProgress("time", 20, "min:sec", 45);
+		vbox2.getChildren().addAll(pane4, pane5);
+
 		HBox hbox = new HBox();
-		hbox.getChildren().addAll(vbox, vbox1);
+		hbox.getChildren().addAll(vbox, vbox1, vbox2);
 		stage.setScene(new Scene(hbox, 700, 700, Color.BLACK));
 
 		stage.show();
@@ -161,6 +174,58 @@ public class FxCSSExample7 extends Application {
 		return pane;
 	}
 
+	public Pane timeProgress(String s, int setY, String sub, int setsubY) {
+		Rectangle rect = new Rectangle(150, 150);
+		rect.setFill(Color.AQUA);
+
+		Text text = new Text(s);
+		text.setBoundsType(TextBoundsType.VISUAL);
+		text.setFont(Font.font("Verdana", FontWeight.EXTRA_BOLD, 20));
+		text.setTextAlignment(TextAlignment.CENTER);
+		text.setTextOrigin(VPos.CENTER);
+
+		double widthheartRate = rect.getWidth();
+		double width2heartRate = text.getLayoutBounds().getWidth();
+		text.setX((widthheartRate - width2heartRate) / 2);
+		text.setY(setY);
+
+		Text subText = new Text(sub);
+		subText.setBoundsType(TextBoundsType.VISUAL);
+		subText.setFont(new Font(20));
+		subText.setTextAlignment(TextAlignment.CENTER);
+		subText.setTextOrigin(VPos.CENTER);
+
+		double widthsubText = rect.getWidth();
+		double width2subText = subText.getLayoutBounds().getWidth();
+		subText.setX((widthsubText - width2subText) / 2);
+		subText.setY(setsubY);
+
+		
+
+		timerLabel.textProperty().bind(timeSeconds.divide(100).asString());
+		timerLabel.setFill(Color.RED);
+		
+		
+		ProgressBar progressBar = new ProgressBar();
+		progressBar.progressProperty().bind(timeSeconds.divide(STARTTIME * 100.0).subtract(1).multiply(-1));
+
+		if (timeline1 != null) {
+			timeline1.stop();
+		}
+		timeSeconds.set((STARTTIME + 1) * 100);
+		timeline1 = new Timeline();
+		timeline1.getKeyFrames().add(new KeyFrame(Duration.seconds(STARTTIME + 1), new KeyValue(timeSeconds, 0)));
+		timeline1.playFromStart();
+
+		double widthprogress = rect.getWidth();
+		double width2progress = progressBar.getLayoutBounds().getWidth();
+		progressBar.setLayoutX((widthprogress - width2progress) / 2);
+		progressBar.setLayoutY(80);
+
+		Pane pane = new Pane(rect, text, subText, progressBar);
+		return pane;
+	}
+
 	public Pane effortLevel(String s, int setY) {
 		Rectangle rect = new Rectangle(150, 150);
 		rect.setFill(Color.AQUA);
@@ -187,37 +252,30 @@ public class FxCSSExample7 extends Application {
 		value.setX((widthvalue - width2value) / 2);
 		value.setY(80);
 
-		
 		Button decrementButton = new Button("-");
 		decrementButton.setFont(Font.font("Verdana", FontWeight.EXTRA_BOLD, 40));
-		// incrementButton.setMaxWidth(100);
 		decrementButton.setMaxSize(4, 4);
 		decrementButton.setBorder(null);
 		decrementButton.setBackground(null);
 		double widthdecrementButton = rect.getWidth();
 		double width2decrementButton = decrementButton.getLayoutBounds().getWidth();
-		decrementButton.setLayoutX(((widthdecrementButton - width2decrementButton) / 2)-70);
+		decrementButton.setLayoutX(((widthdecrementButton - width2decrementButton) / 2) - 70);
 		decrementButton.setLayoutY(80);
 
 		decrementButton.setOnAction(event -> {
 			if (value.getText() != "") {
 				String text2 = value.getText();
 				int parseInt = Integer.parseInt(text2);
-				if(parseInt>0) {
+				if (parseInt > 0) {
 					--parseInt;
 				}
-				
-				
+
 				value.setText(String.valueOf(parseInt));
 			} else {
 				value.setText("0");
 			}
-			// System.out.println("Hi");
 		});
-		
-		
-		
-		
+
 		Button incrementButton = new Button("+");
 		incrementButton.setFont(Font.font("Verdana", FontWeight.EXTRA_BOLD, 40));
 		// incrementButton.setMaxWidth(100);
@@ -241,16 +299,12 @@ public class FxCSSExample7 extends Application {
 			// System.out.println("Hi");
 		});
 
-		Pane pane = new Pane(rect, text, value, decrementButton,incrementButton);
+		Pane pane = new Pane(rect, text, value, decrementButton, incrementButton);
 		return pane;
 	}
 
 	public void setTime() {
-		// flip 60 seconds over to a minute
-		double mi = counter++;
-		// System.out.println((mi * 60) + seconds);
-		double res = mi / ((mi * 60) + seconds);
-		// System.out.println(res);
+		
 		if (seconds == 0) {
 			seconds = 59;
 			minutes--;
@@ -267,6 +321,7 @@ public class FxCSSExample7 extends Application {
 		timer.setText(m + ":" + s);
 	}
 
+	
 	public static void main(String[] args) {
 		launch(args);
 	}
