@@ -3,9 +3,13 @@ package application;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -26,6 +30,7 @@ public class FxCSSExample7 extends Application {
 	private Timeline timeline;
 	private Text timer;
 	private int counter;
+	private Text value;
 
 	public FxCSSExample7() {
 		minutes = 19;
@@ -104,20 +109,10 @@ public class FxCSSExample7 extends Application {
 		Rectangle r3 = new Rectangle(150, 150);
 		r3.setFill(Color.AQUA);
 
-//		Text heartRate = new Text("heart rate");
-//		heartRate.setBoundsType(TextBoundsType.VISUAL);
-//		heartRate.setFont(new Font(20));
-//		heartRate.setTextAlignment(TextAlignment.CENTER);
-//		heartRate.setTextOrigin(VPos.CENTER);
-//
-//		double widthheartRate = r3.getWidth();
-//		double width2heartRate = heartRate.getLayoutBounds().getWidth();
-//		heartRate.setX((widthheartRate - width2heartRate) / 2);
-//		heartRate.setY(10);
-
 		Pane pane2 = returnRect("heart rate", 20, "beats/min", 45, "93", 80);
+		Pane pane3 = effortLevel("effort level", 40);
 
-		vbox1.getChildren().add(pane2);
+		vbox1.getChildren().addAll(pane2, pane3);
 		HBox hbox = new HBox();
 		hbox.getChildren().addAll(vbox, vbox1);
 		stage.setScene(new Scene(hbox, 700, 700, Color.BLACK));
@@ -125,7 +120,7 @@ public class FxCSSExample7 extends Application {
 		stage.show();
 	}
 
-	public static Pane returnRect(String s, int setY, String sub, int setsubY, String val, int valsetY) {
+	public Pane returnRect(String s, int setY, String sub, int setsubY, String val, int valsetY) {
 		Rectangle rect = new Rectangle(150, 150);
 		rect.setFill(Color.AQUA);
 
@@ -166,12 +161,96 @@ public class FxCSSExample7 extends Application {
 		return pane;
 	}
 
+	public Pane effortLevel(String s, int setY) {
+		Rectangle rect = new Rectangle(150, 150);
+		rect.setFill(Color.AQUA);
+
+		Text text = new Text(s);
+		text.setBoundsType(TextBoundsType.VISUAL);
+		text.setFont(Font.font("Verdana", FontWeight.EXTRA_BOLD, 20));
+		text.setTextAlignment(TextAlignment.CENTER);
+		text.setTextOrigin(VPos.CENTER);
+
+		double widthheartRate = rect.getWidth();
+		double width2heartRate = text.getLayoutBounds().getWidth();
+		text.setX((widthheartRate - width2heartRate) / 2);
+		text.setY(setY);
+
+		value = new Text("0");
+		value.setBoundsType(TextBoundsType.VISUAL);
+		value.setFont(new Font(60));
+		value.setTextAlignment(TextAlignment.CENTER);
+		value.setTextOrigin(VPos.CENTER);
+
+		double widthvalue = rect.getWidth();
+		double width2value = value.getLayoutBounds().getWidth();
+		value.setX((widthvalue - width2value) / 2);
+		value.setY(80);
+
+		
+		Button decrementButton = new Button("-");
+		decrementButton.setFont(Font.font("Verdana", FontWeight.EXTRA_BOLD, 40));
+		// incrementButton.setMaxWidth(100);
+		decrementButton.setMaxSize(4, 4);
+		decrementButton.setBorder(null);
+		decrementButton.setBackground(null);
+		double widthdecrementButton = rect.getWidth();
+		double width2decrementButton = decrementButton.getLayoutBounds().getWidth();
+		decrementButton.setLayoutX(((widthdecrementButton - width2decrementButton) / 2)-70);
+		decrementButton.setLayoutY(80);
+
+		decrementButton.setOnAction(event -> {
+			if (value.getText() != "") {
+				String text2 = value.getText();
+				int parseInt = Integer.parseInt(text2);
+				if(parseInt>0) {
+					--parseInt;
+				}
+				
+				
+				value.setText(String.valueOf(parseInt));
+			} else {
+				value.setText("0");
+			}
+			// System.out.println("Hi");
+		});
+		
+		
+		
+		
+		Button incrementButton = new Button("+");
+		incrementButton.setFont(Font.font("Verdana", FontWeight.EXTRA_BOLD, 40));
+		// incrementButton.setMaxWidth(100);
+		incrementButton.setMaxSize(4, 4);
+		incrementButton.setBorder(null);
+		incrementButton.setBackground(null);
+		double widthincrementButton = rect.getWidth();
+		double width2incrementButton = incrementButton.getLayoutBounds().getWidth();
+		incrementButton.setLayoutX((widthincrementButton - width2incrementButton) / 2);
+		incrementButton.setLayoutY(80);
+
+		incrementButton.setOnAction(event -> {
+			if (value.getText() != "") {
+				String text2 = value.getText();
+				int parseInt = Integer.parseInt(text2);
+				++parseInt;
+				value.setText(String.valueOf(parseInt));
+			} else {
+				value.setText("0");
+			}
+			// System.out.println("Hi");
+		});
+
+		Pane pane = new Pane(rect, text, value, decrementButton,incrementButton);
+		return pane;
+	}
+
 	public void setTime() {
 		// flip 60 seconds over to a minute
 		double mi = counter++;
-		System.out.println((mi * 60) + seconds);
-		double res=mi/((mi * 60) + seconds);
-		System.out.println(res);
+		// System.out.println((mi * 60) + seconds);
+		double res = mi / ((mi * 60) + seconds);
+		// System.out.println(res);
 		if (seconds == 0) {
 			seconds = 59;
 			minutes--;
