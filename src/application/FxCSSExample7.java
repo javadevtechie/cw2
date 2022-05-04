@@ -1,6 +1,7 @@
 package application;
 
-import javax.swing.GroupLayout.Alignment;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -12,14 +13,16 @@ import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -43,6 +46,7 @@ public class FxCSSExample7 extends Application {
 	private Timeline timeline1;
 	private Text timerLabel = new Text();
 	private IntegerProperty timeSeconds = new SimpleIntegerProperty(STARTTIME * 100);
+	private Popup popup = new Popup();
 
 	public FxCSSExample7() {
 		minutes = 19;
@@ -51,6 +55,8 @@ public class FxCSSExample7 extends Application {
 
 	@Override
 	public void start(Stage stage) {
+		stage.resizableProperty().setValue(Boolean.FALSE);
+		stage.setOnCloseRequest(e -> e.consume());
 
 		Rectangle r1 = new Rectangle(150, 100);
 		r1.setFill(Color.AQUA);
@@ -127,35 +133,110 @@ public class FxCSSExample7 extends Application {
 		vbox2.getChildren().addAll(pane4, pane5, pane6, pane7);
 		vbox2.setSpacing(2);
 
+		VBox vbox3 = new VBox();
+		Pane pane8 = returnRect("distance", 20, "km", 45, "1.51", 80);
+		Pane pane9 = returnRect("Power", 20, "watts", 45, "216", 80);
+		Pane pane10 = returnRect("Speed", 20, "spm", 45, "94", 80);
+		vbox3.getChildren().addAll(pane8, pane9, pane10);
+		vbox3.setSpacing(2);
+		vbox3.setPadding(new Insets(2, 2, 2, 2));
+
+		VBox vbox4 = new VBox();
+		Pane pane11 = returnRectPane("TV",
+				"C:\\Users\\U6054040\\OneDrive - Clarivate Analytics\\Documents\\cw2\\cw2\\src\\application\\download.png");
+		Pane pane12 = returnRectPane("TV",
+				"C:\\Users\\U6054040\\OneDrive - Clarivate Analytics\\Documents\\cw2\\cw2\\src\\application\\download.png");
+
+		Pane pane13 = returnRectPane("TV",
+				"C:\\Users\\U6054040\\OneDrive - Clarivate Analytics\\Documents\\cw2\\cw2\\src\\application\\download.png");
+
+		vbox4.getChildren().addAll(pane11, pane12, pane13);
+		vbox4.setSpacing(2);
+		vbox4.setPadding(new Insets(2, 2, 2, 2));
+
 		HBox hbox = new HBox();
-		hbox.getChildren().addAll(vbox, vbox1, vbox2);
-		stage.setScene(new Scene(hbox, 700, 700, Color.BLACK));
+		hbox.getChildren().addAll(vbox, vbox1, vbox2, vbox3, vbox4);
+		stage.setScene(new Scene(hbox, 800, 500, Color.BLACK));
 
 		stage.show();
 	}
 
+	public Pane returnRectPane(String s, String imagePath) {
+
+		Rectangle rect = new Rectangle(150, 150);
+		rect.setFill(Color.AQUA);
+
+		Text text = new Text(s);
+		text.setBoundsType(TextBoundsType.VISUAL);
+		text.setFont(Font.font("Verdana", 20));
+		text.setTextAlignment(TextAlignment.CENTER);
+		text.setTextOrigin(VPos.CENTER);
+
+		text.setX(10);
+		text.setY(15);
+		Rectangle imageRect = new Rectangle(50, 50);
+		imageRect.setFill(Color.RED);
+
+		FileInputStream input;
+		ImageView imageView = null;
+		try {
+			input = new FileInputStream(imagePath);
+			Image image = new Image(input);
+			imageView = new ImageView(image);
+			imageView.setFitWidth(50);
+			imageView.setFitHeight(50);
+			imageView.setX(0);
+			imageView.setY(100);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Pane pane = new Pane(rect, text, imageView);
+		return pane;
+
+	}
+
 	public Pane returnPauseOrStop(Stage s) {
+		Rectangle rect = new Rectangle(150, 74);
+		rect.setFill(Color.RED);
 		Button b = new Button();
 		b.setText("Pause\nStop");
-		/*
-		 * Text text = new Text("Pause\nStop");
-		 * text.setBoundsType(TextBoundsType.VISUAL); text.setFont(Font.font("Verdana",
-		 * FontWeight.EXTRA_BOLD, 20)); text.setTextAlignment(TextAlignment.CENTER);
-		 * text.setTextOrigin(VPos.CENTER);
-		 */
+		b.setFont(Font.font("Verdana", FontWeight.EXTRA_BOLD, 20));
+		b.setBackground(null);
+		b.setBorder(null);
+		b.setMaxHeight(500);
+		b.maxWidth(1000);
+		b.setLayoutX(12);
+		b.setLayoutY(10);
+		Pane popupPane = getPopupPane(s);
+		b.setOnAction(event -> {
+			if (!popup.isShowing()) {
+				popup.show(s);
+				s.requestFocus();
+				pause();
+			} else
+				popup.hide();
+		});
+
+		Pane pane = new Pane(rect, b);
+		return pane;
+	}
+
+	public Pane getPopupPane(Stage s) {
+
 		HBox hb = new HBox();
 		VBox vbox = new VBox();
-
-		Popup popup = new Popup();
-//		popup.setHeight(300);
-//		popup.setWidth(300);
+		new Popup();
 		popup.setWidth(2000);
 		popup.setHeight(2000);
 		Pane popUpPane = new Pane();
 
 		Button restartButton = new Button("Restart");
 		Button stopButton = new Button("Stop");
+		restartButton.setLayoutX(10);
+		restartButton.setLayoutY(20);
 		HBox h = new HBox();
+		// h.setPadding(new Insets(4, 5, 6, 6));
 		h.getChildren().addAll(stopButton, restartButton);
 		Text t = new Text("The Exercise is temporarily\nsuspended");
 		t.setFont(new Font(20));
@@ -173,29 +254,10 @@ public class FxCSSExample7 extends Application {
 		stopButton.setOnAction(event -> {
 			s.close();
 		});
-		String time = timer.getText();
-		System.out.println(time);
+
 		popup.getContent().addAll(new Rectangle(0, 0, 300, 300), popUpPane);
-		Label label = new Label("This is a Popup");
-		label.setStyle(" -fx-background-color: Red;");
-		// popup.getContent().add(label,);
-		label.setMinWidth(80);
-		label.setMinHeight(50);
-		b.setOnAction(event -> {
 
-			if (!popup.isShowing()) {
-				popup.show(s);
-				s.requestFocus();
-				pause();
-			}
-
-			else
-				popup.hide();
-
-		});
-
-		Pane pane = new Pane(b);
-		return pane;
+		return h;
 
 	}
 
