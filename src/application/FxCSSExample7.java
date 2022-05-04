@@ -1,5 +1,7 @@
 package application;
 
+import javax.swing.GroupLayout.Alignment;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -10,6 +12,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -23,6 +26,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextBoundsType;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -118,16 +122,100 @@ public class FxCSSExample7 extends Application {
 
 		Pane pane4 = returnRect("calories", 20, "kcal", 45, "571", 80);
 		Pane pane5 = timeProgress("time", 20, "min:sec", 45);
-		vbox2.getChildren().addAll(pane4, pane5);
+		Pane pane6 = returnPauseOrStop(stage);
+		Pane pane7 = returnCoolDown();
+		vbox2.getChildren().addAll(pane4, pane5, pane6, pane7);
 		vbox2.setSpacing(2);
-
-		///vbox2.getChildren().add(pane4,);
 
 		HBox hbox = new HBox();
 		hbox.getChildren().addAll(vbox, vbox1, vbox2);
 		stage.setScene(new Scene(hbox, 700, 700, Color.BLACK));
 
 		stage.show();
+	}
+
+	public Pane returnPauseOrStop(Stage s) {
+		Button b = new Button();
+		b.setText("Pause\nStop");
+		/*
+		 * Text text = new Text("Pause\nStop");
+		 * text.setBoundsType(TextBoundsType.VISUAL); text.setFont(Font.font("Verdana",
+		 * FontWeight.EXTRA_BOLD, 20)); text.setTextAlignment(TextAlignment.CENTER);
+		 * text.setTextOrigin(VPos.CENTER);
+		 */
+		HBox hb = new HBox();
+		VBox vbox = new VBox();
+
+		Popup popup = new Popup();
+//		popup.setHeight(300);
+//		popup.setWidth(300);
+		popup.setWidth(2000);
+		popup.setHeight(2000);
+		Pane popUpPane = new Pane();
+
+		Button restartButton = new Button("Restart");
+		Button stopButton = new Button("Stop");
+		HBox h = new HBox();
+		h.getChildren().addAll(stopButton, restartButton);
+		Text t = new Text("The Exercise is temporarily\nsuspended");
+		t.setFont(new Font(20));
+		t.setFill(Color.WHITE);
+		// t.setTextAlignment(Alignment.);
+		t.setTextAlignment(TextAlignment.CENTER);
+		vbox.getChildren().addAll(t, h);
+		hb.getChildren().addAll(vbox);
+		popUpPane.getChildren().addAll(hb);
+		restartButton.setOnAction(event -> {
+			restart();
+			popup.hide();
+		});
+
+		stopButton.setOnAction(event -> {
+			s.close();
+		});
+		String time = timer.getText();
+		System.out.println(time);
+		popup.getContent().addAll(new Rectangle(0, 0, 300, 300), popUpPane);
+		Label label = new Label("This is a Popup");
+		label.setStyle(" -fx-background-color: Red;");
+		// popup.getContent().add(label,);
+		label.setMinWidth(80);
+		label.setMinHeight(50);
+		b.setOnAction(event -> {
+
+			if (!popup.isShowing()) {
+				popup.show(s);
+				s.requestFocus();
+				pause();
+			}
+
+			else
+				popup.hide();
+
+		});
+
+		Pane pane = new Pane(b);
+		return pane;
+
+	}
+
+	public Pane returnCoolDown() {
+		Rectangle rect = new Rectangle(150, 74);
+		rect.setFill(Color.LIGHTBLUE);
+		Text text = new Text("COOL DOWN");
+		text.setBoundsType(TextBoundsType.VISUAL);
+		text.setFont(Font.font("Verdana", FontWeight.EXTRA_BOLD, 20));
+		text.setTextAlignment(TextAlignment.CENTER);
+		text.setTextOrigin(VPos.CENTER);
+
+		double widthheartRate = rect.getWidth();
+		double width2heartRate = text.getLayoutBounds().getWidth();
+		text.setX((widthheartRate - width2heartRate) / 2);
+		text.setY(40);
+
+		Pane pane = new Pane(rect, text);
+		return pane;
+
 	}
 
 	public Pane returnRect(String s, int setY, String sub, int setsubY, String val, int valsetY) {
@@ -211,13 +299,11 @@ public class FxCSSExample7 extends Application {
 		timeline1.getKeyFrames().add(new KeyFrame(Duration.seconds(STARTTIME + 1), new KeyValue(timeSeconds, 0)));
 		timeline1.playFromStart();
 
-
 		double widthprogress = rect.getWidth();
 		double width2progress = progressBar.getLayoutBounds().getWidth();
 		progressBar.setLayoutX(((widthprogress - width2progress) / 2) - 50);
 		progressBar.setLayoutY(80);
 
-		
 		Text timeText = new Text("20:00");
 		timeText.setBoundsType(TextBoundsType.VISUAL);
 		timeText.setFont(Font.font("Verdana", 20));
@@ -228,8 +314,8 @@ public class FxCSSExample7 extends Application {
 		double width2timeText = timeText.getLayoutBounds().getWidth();
 		timeText.setX((widthtimeText - width2timeText) / 2);
 		timeText.setY(120);
-		
-		Pane pane = new Pane(rect, text, subText, progressBar,timeText);
+
+		Pane pane = new Pane(rect, text, subText, progressBar, timeText);
 		return pane;
 	}
 
@@ -285,13 +371,13 @@ public class FxCSSExample7 extends Application {
 		});
 
 		Button incrementButton = new Button("+");
-		//Background background = new Background();
+		// Background background = new Background();
 		incrementButton.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
 		incrementButton.setFont(Font.font("Verdana", FontWeight.EXTRA_BOLD, 20));
 		// incrementButton.setMaxWidth(100);
 		incrementButton.setMaxSize(3, 3);
-		//incrementButton.setBorder(null);
-		//incrementButton.setBackground(null);
+		// incrementButton.setBorder(null);
+		// incrementButton.setBackground(null);
 		double widthincrementButton = rect.getWidth();
 		double width2incrementButton = incrementButton.getLayoutBounds().getWidth();
 		incrementButton.setLayoutX((widthincrementButton - width2incrementButton) / 2);
@@ -311,6 +397,16 @@ public class FxCSSExample7 extends Application {
 
 		Pane pane = new Pane(rect, text, value, decrementButton, incrementButton);
 		return pane;
+	}
+
+	public void restart() {
+		timeline.playFromStart();
+		timeline1.playFromStart();
+	}
+
+	public void pause() {
+		timeline.pause();
+		timeline1.pause();
 	}
 
 	public void setTime() {
